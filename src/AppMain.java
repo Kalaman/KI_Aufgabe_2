@@ -27,10 +27,20 @@ public class AppMain {
 
             sCurrentLine = br.readLine();
 
+
             String [] splitedNodes = sCurrentLine.split(",");
 
-            for (String currentNodeStr : splitedNodes)
-                nodeList.add(new Node(currentNodeStr.trim()));
+            for (String currentNodeStr : splitedNodes) {
+                currentNodeStr = currentNodeStr.trim();
+                if (currentNodeStr.equalsIgnoreCase("g"))
+                {
+                    nodeList.add(new AlphabeticNode(currentNodeStr.trim()));
+                }
+                else
+                {
+                    nodeList.add(new Node(currentNodeStr.trim()));
+                }
+            }
 
             while ((sCurrentLine = br.readLine()) != null) {
                 String [] splitedLine = sCurrentLine.split(",");
@@ -38,34 +48,61 @@ public class AppMain {
                 for (int i=0;i< nodeList.size();++i)
                 {
                     try {
-                        nodeList.get(i).addValue(Integer.parseInt(splitedLine[i].trim()));
-                    }catch (Exception e){}
+                        if (nodeList.get(i) instanceof AlphabeticNode)
+                        {
+                            switch (splitedLine[i].trim().toUpperCase())
+                            {
+                                case "A":
+                                    nodeList.get(i).addValue(AlphabeticNode.VALUE_A);
+                                    break;
+                                case "B":
+                                    nodeList.get(i).addValue(AlphabeticNode.VALUE_B);
+                                    break;
+                                case "C":
+                                    nodeList.get(i).addValue(AlphabeticNode.VALUE_C);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            nodeList.get(i).addValue(Integer.parseInt(splitedLine[i].trim()));
+                        }
+                    }catch (Exception e){ e.printStackTrace();}
                 }
             }
 
+            int sumData = 10000;
 
             for (Node node: nodeList)
-                System.out.println(node);
+            {
+                if (node instanceof AlphabeticNode)
+                {
+                    float probA = ((float)((AlphabeticNode)node).getValue(AlphabeticNode.VALUE_A) / (float)sumData) * 100;
+                    float probB = ((float)((AlphabeticNode)node).getValue(AlphabeticNode.VALUE_B) / (float)sumData) * 100;
+                    float probC = ((float)((AlphabeticNode)node).getValue(AlphabeticNode.VALUE_C) / (float)sumData) * 100;
+
+                    System.out.println(node + " Prob: A=" + probA + "% B=" + probB + "% C=" + probC + "%");
+                }
+                else {
+                    float prob = ((float)node.getValue() / (float)sumData) * 100;
+                    System.out.println(node + " Prob: " + prob + " %");
+                }
+
+            }
+
 
         } catch (IOException e) {
-
             e.printStackTrace();
-
         } finally {
-
             try {
-
                 if (br != null)
                     br.close();
-
                 if (fr != null)
                     fr.close();
-
             } catch (IOException ex) {
-
                 ex.printStackTrace();
-
             }
         }
     }
+
 }
